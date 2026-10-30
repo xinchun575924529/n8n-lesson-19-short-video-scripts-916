@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>n8n 实战课 19：短视频脚本生成 + 9:16 渲染 API 工作流</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: "Microsoft YaHei", "PingFang SC", sans-serif; background: #0f1b2d; color: #e8eef7; line-height: 1.7; }
+  .wrap { max-width: 880px; margin: 0 auto; padding: 48px 24px 80px; }
+  .badge { display: inline-block; background: #b45309; color: #fff; font-size: 13px; padding: 4px 14px; border-radius: 999px; letter-spacing: 1px; }
+  h1 { font-size: 34px; margin: 18px 0 10px; line-height: 1.35; }
+  .sub { color: #93a7c4; font-size: 16px; margin-bottom: 32px; }
+  .card { background: #16263f; border: 1px solid #24405f; border-radius: 14px; padding: 24px 28px; margin-bottom: 22px; }
+  .card h2 { font-size: 20px; color: #fbbf24; margin-bottom: 12px; }
+  .card ul { padding-left: 22px; }
+  .card li { margin: 6px 0; }
+  .flow { background: #0b1524; border-radius: 10px; padding: 18px 20px; font-family: Consolas, monospace; font-size: 14px; color: #9fe6a0; white-space: pre-wrap; }
+  .pill { display: inline-block; background: #0b1524; border: 1px solid #2c4a70; border-radius: 8px; padding: 2px 10px; font-size: 13px; color: #ffd479; margin: 2px 4px 2px 0; }
+  .kpis { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 22px; }
+  .kpi { flex: 1; min-width: 140px; background: #16263f; border: 1px solid #24405f; border-radius: 12px; padding: 16px; text-align: center; }
+  .kpi b { display: block; font-size: 26px; color: #fbbf24; }
+  .kpi span { font-size: 13px; color: #93a7c4; }
+  a.btn { display: inline-block; background: #b45309; color: #fff; text-decoration: none; padding: 12px 26px; border-radius: 10px; font-size: 16px; margin-top: 8px; }
+  a.btn:hover { background: #d97706; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { border: 1px solid #24405f; padding: 8px 10px; text-align: left; }
+  th { background: #0b1524; color: #fbbf24; }
+  .foot { color: #5c7292; font-size: 13px; margin-top: 36px; text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <span class="badge">n8n 实战课 19</span>
+  <h1>短视频脚本生成 + 9:16 渲染<br>四接口 API 工作流</h1>
+  <p class="sub">官方模板 #21716 · 119 断言三关全绿 · DeepSeek 免费替身实测 · 教科书级护栏设计</p>
+
+  <div class="kpis">
+    <div class="kpi"><b>20</b><span>节点吃透</span></div>
+    <div class="kpi"><b>119/119</b><span>三关断言全过</span></div>
+    <div class="kpi"><b>9 坑</b><span>观察+实锤全录</span></div>
+    <div class="kpi"><b>0 元</b><span>免费替身链</span></div>
+  </div>
+
+  <div class="card">
+    <h2>这是什么</h2>
+    <p>把「AI 写短视频脚本 → 人工审 → 渲染 9:16 → 取成片」做成四个标准 HTTP 接口的生产级 webhook 工作流。前端/App/机器人只管 POST，工作流内部做校验、调 AI、人工闸门、错误分级。</p>
+  </div>
+
+  <div class="card">
+    <h2>四个接口</h2>
+    <div class="flow">POST /webhook  {"action":"draft"}   → 主题进，整套脚本包出（标题/双hook/4分镜/口播/三平台文案）
+POST /webhook  {"action":"audit"}   → 文案进，确定性体检报告出（词数/标题/违规词）
+POST /webhook  {"action":"render"}  → 双闸门通过，提交 9:16 渲染，拿任务号
+POST /webhook  {"action":"status"}  → 任务号进，成片 URL 出</div>
+  </div>
+
+  <div class="card">
+    <h2>为什么值得学</h2>
+    <ul>
+      <li>⭐ <b>教科书级护栏</b>：入参白名单 → LLM 输出 schema 强校验 → audit 确定性预检 → 人工双闸门，四层递进</li>
+      <li>⭐ <b>错误分级范式</b>：调用方错 400 / 上游故障 502，API 语义干净</li>
+      <li>⭐ <b>无状态异步设计</b>：render 拿 id、status 轮询，长任务 API 标准形态</li>
+      <li>实锤坑「LLM 词数漂移」：prompt 软约束被无视，护栏正确兜底——141 词被告警的活证据</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2>免费替身链</h2>
+    <table>
+      <tr><th>模板节点</th><th>付费原版</th><th>免费替身</th></tr>
+      <tr><td>LLM 写脚本</td><td>OpenAI gpt-4o-mini</td><td>DeepSeek deepseek-chat（实测真跑 10/10）</td></tr>
+      <tr><td>视频渲染</td><td>Creatomate $29/月</td><td>本地 ffmpeg 字幕卡 / Seedance 生视频</td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2>验证结论</h2>
+    <p><span class="pill">A 单元级 81/81</span><span class="pill">B mock 全链 28/28</span><span class="pill">C DeepSeek 真跑 10/10</span></p>
+    <p style="margin-top:10px">42 个单元 case + 9 个全链场景 + 真实 LLM 产出「蜜蜂授粉」主题脚本（80 词口播、4 分镜、三平台 kit），测试脚本全部随包附赠可复跑。</p>
+  </div>
+
+  <div class="card">
+    <h2>课程包清单</h2>
+    <ul>
+      <li>workflow.json 官方原版 + workflow-fixed.json 中文修复版</li>
+      <li>文档 6 篇：总览 / 架构拆解 / 坑与修复 / 验证报告 / 免费替身 / 上线加固</li>
+      <li>练习 4 题（curl 跑通 → 护栏测试 → 契约类型 → ffmpeg 替身落地）</li>
+      <li>L2 三关测试生成器与运行器（Python，可复跑）</li>
+    </ul>
+    <a class="btn" href="https://github.com/xinchun575924529/n8n-lesson-19-short-video-scripts-916">GitHub 仓库</a>
+  </div>
+
+  <p class="foot">n8n 实战课 · 工厂流水线出品 · 模板 #21716 by TYKAIRO</p>
+</div>
+</body>
+</html>
