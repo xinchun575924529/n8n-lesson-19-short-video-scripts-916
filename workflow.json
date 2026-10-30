@@ -1,0 +1,630 @@
+{
+  "name": "AI Shorts Video Generator & YouTube TikTok Reels Automation | TYKAIRO",
+  "nodes": [
+    {
+      "id": "4c7de0ff-2811-491b-b30b-fd86a1b6dbd4",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1808,
+        -416
+      ],
+      "parameters": {
+        "width": 480,
+        "height": 896,
+        "content": "## AI Shorts Video Generator & YouTube TikTok Reels Automation | TYKAIRO\n\n### How it works\n\nThis workflow receives a webhook request to generate or manage a short-form video, validates the request, then routes it by action. It can create an AI-generated script and SEO kit, start an approved 9:16 render in Creatomate, check render status, run a script preflight checklist, or return normalized validation errors. Each branch responds directly to the webhook with the relevant result or error.\n\n### Setup steps\n\n- Configure the webhook URL and ensure callers send the expected action, budget, approval, script, and render identifiers in the request payload.\n- Add credentials or headers for the OpenAI Chat Completions API used by the script and viral hook generation request.\n- Add Creatomate API authentication and confirm the render template/settings used by the render creation request.\n- Review the validation and routing code nodes so their accepted actions match the client application calling the webhook.\n\n### Customization\n\nAdjust the AI prompt, SEO metadata rules, Creatomate template, and validation thresholds to match your brand, target platforms, and production budget."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "7acf83fb-7a1d-4396-b2af-20beea311c62",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1248,
+        -144
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 480,
+        "height": 320,
+        "content": "## Receive and validate request\n\nAccepts the incoming webhook call and performs the first validation of action, budget, and approval fields before routing."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "9d907b10-e435-49dc-8637-6954703112d1",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -720,
+        -208
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 240,
+        "height": 480,
+        "content": "## Route requested action\n\nCentral switch node that sends validated requests to the correct workflow branch for drafting, rendering, status checks, preflight, or error handling."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "df18711a-83af-4934-89fa-5a81af31bef9",
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -432,
+        -416
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 720,
+        "height": 304,
+        "content": "## Generate script kit\n\nCalls OpenAI to create short-form script and hook variations, verifies the result, builds SEO publishing assets, and returns the storyboard package."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "9cc19d4f-7b3d-4cdd-ada5-d7824e80f584",
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -432,
+        -80
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 720,
+        "height": 304,
+        "content": "## Start video render\n\nSubmits an approved vertical video render job to Creatomate, checks the submitted job response, and returns the render job ID."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "5d561d6a-f296-4c13-a1ce-e8e00b427ae9",
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -432,
+        256
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 720,
+        "height": 304,
+        "content": "## Check render status\n\nFetches the current Creatomate render status, verifies whether the video is ready, and returns either the final video URL or an error state."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "c3078842-6186-4c24-ae78-5ed91154d3a9",
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -432,
+        592
+      ],
+      "parameters": {
+        "color": 7,
+        "width": 720,
+        "height": 432,
+        "content": "## Preflight and errors\n\nLower canvas cluster that handles non-render output paths: it normalizes invalid input errors for the caller and also runs a zero-cost script preflight checklist with its own response."
+      },
+      "typeVersion": 1
+    },
+    {
+      "id": "3d40650d-943d-5439-9234-3ae1e50f304b",
+      "name": "When Video Request Received",
+      "type": "n8n-nodes-base.webhook",
+      "position": [
+        -1200,
+        20
+      ],
+      "webhookId": "38128b3c-ad71-59de-9485-2805d2d8f474",
+      "parameters": {
+        "path": "tykairo-shorts-factory-v1",
+        "options": {},
+        "httpMethod": "POST",
+        "responseMode": "responseNode",
+        "authentication": "headerAuth"
+      },
+      "typeVersion": 2.1
+    },
+    {
+      "id": "9432de8d-2d02-5e82-93b7-0ab1e3564f4a",
+      "name": "Check Action and Budget Validity",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        -920,
+        20
+      ],
+      "parameters": {
+        "jsCode": "const b=$input.first().json.body||{}, action=String(b.action||'').trim().toLowerCase();\nconst fail=s=>[{json:{ok:false,action:'invalid',errorCode:'validation',error:s}}];\nconst clean=(v,max=1400)=>String(v||'').trim().slice(0,max);\nif(action==='draft'){\n  const topic=clean(b.topic,401), language=clean(b.language||'English',40);\n  const platform=['youtube','tiktok','instagram'].includes(String(b.platform||'').toLowerCase())?String(b.platform).toLowerCase():'youtube';\n  const audience=clean(b.audience||'general audience',100), tone=clean(b.tone||'engaging and clear',80);\n  if(topic.length<5||topic.length>400)return fail('topic must contain 5–400 characters');\n  if(!language||!audience||!tone)return fail('language/audience/tone cannot be blank');\n  const messages=[\n    {role:'system',content:'You create ORIGINAL factuality-conscious 9:16 short-form video content. Return ONLY a JSON object with nonempty string keys title,hook_a,hook_b,supporting_text,cta,description,voiceover and arrays hashtags,seo_keywords,scenes. Exactly 4 scenes, each with on_screen_text,visual_direction,voiceover_line (all strings). Target 25–45 seconds and 65–105 spoken words. Suggest only footage the user owns or has licensed. No fabricated claims, fake testimonials, copied scripts, unsafe sensationalism or copyrighted music. Captions concise. Title <=95 chars. Hooks distinct. Hashtags 3–8. Avoid implying this content is fact-checked, trending or guaranteed viral.'},\n    {role:'user',content:`Topic: ${topic}\\nLanguage: ${language}\\nPlatform: ${platform}\\nAudience: ${audience}\\nStyle: ${tone}\\nCreate two alternative hooks and a shot-by-shot storyboard, voiceover and platform-specific metadata.`}\n  ];\n  return [{json:{action:'draft',ok:true,platform,topic,requestBody:{model:'gpt-4o-mini',temperature:0.65,response_format:{type:'json_object'},messages}}}];\n}\nif(action==='audit'){\n  const title=clean(b.title,150),hook=clean(b.hook,240),voiceover=clean(b.voiceover,5000);\n  if(!title||!hook||!voiceover)return fail('audit requires title, hook and voiceover');\n  const words=voiceover.split(/\\s+/).filter(Boolean).length,duration=Math.round(words/2.5),warnings=[];\n  if(title.length>95)warnings.push('Title exceeds suggested 95-character limit');\n  if(words<65||words>105)warnings.push('Voiceover may not fit a 25–45 second short');\n  if(/guaranteed|100% guaranteed|miracle cure|اغتنم الفرصة مضمونة/i.test(title+' '+voiceover))warnings.push('Review absolute or exaggerated claims');\n  if(hook.trim().toLowerCase()===title.trim().toLowerCase())warnings.push('Hook and title are identical; test distinct openings');\n  return [{json:{action:'audit',ok:true,route:'audit',audit:{spoken_words:words,estimated_duration_sec:duration,warnings,manual_checks:['Verify factual claims and sources','Check music, footage, voice and image licenses','Review subtitles, accessibility and platform terms','Confirm brand safety before paid render'],passed_basic_copy_checks:warnings.length===0},note:'This is a deterministic copy preflight, not fact-checking or copyright clearance.'}}];\n}\nif(action==='render'){\n  const templateId=clean(b.template_id,120),hook=clean(b.hook,200),support=clean(b.supporting_text,1500),cta=clean(b.cta,200);\n  if(b.approved!==true||b.rights_confirmed!==true)return fail('render requires approved=true and rights_confirmed=true after human review');\n  if(!/^[a-zA-Z0-9-]{10,100}$/.test(templateId))return fail('Provide a real Creatomate template_id');\n  if(!hook||hook.length>160||!support||support.length>1200||!cta||cta.length>160)return fail('Provide valid hook, supporting_text and cta');\n  return [{json:{action:'render',ok:true,requestBody:{template_id:templateId,modifications:{Hook:hook,Supporting_Text:support,CTA:cta},max_width:1080,max_height:1920}}}];\n}\nif(action==='status'){\n  const renderId=clean(b.render_id,60);\n  if(!/^[0-9a-fA-F-]{30,45}$/.test(renderId))return fail('render_id must be a Creatomate UUID-like ID');\n  return [{json:{action:'status',ok:true,renderId}}];\n}\nreturn fail('action must be draft, audit, render or status');"
+      },
+      "typeVersion": 2
+    },
+    {
+      "id": "1846c38c-6d53-58dd-91e1-cd8760a29adc",
+      "name": "Route by Video Task",
+      "type": "n8n-nodes-base.switch",
+      "position": [
+        -670,
+        20
+      ],
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "outputKey": "Draft",
+              "conditions": {
+                "options": {
+                  "leftValue": "",
+                  "caseSensitive": false,
+                  "typeValidation": "strict"
+                },
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "id": "319b5d18-cc59-5dcd-8319-2fa6f73a5ddc",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "leftValue": "={{ $json.action }}",
+                    "rightValue": "draft"
+                  }
+                ]
+              },
+              "renameOutput": true
+            },
+            {
+              "outputKey": "Render",
+              "conditions": {
+                "options": {
+                  "leftValue": "",
+                  "caseSensitive": false,
+                  "typeValidation": "strict"
+                },
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "id": "7db13144-a62b-5682-958b-dd17a9621dfa",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "leftValue": "={{ $json.action }}",
+                    "rightValue": "render"
+                  }
+                ]
+              },
+              "renameOutput": true
+            },
+            {
+              "outputKey": "Status",
+              "conditions": {
+                "options": {
+                  "leftValue": "",
+                  "caseSensitive": false,
+                  "typeValidation": "strict"
+                },
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "id": "9d7bdb04-e828-5e7d-899e-bf1f6f682893",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "leftValue": "={{ $json.action }}",
+                    "rightValue": "status"
+                  }
+                ]
+              },
+              "renameOutput": true
+            },
+            {
+              "outputKey": "Audit",
+              "conditions": {
+                "options": {
+                  "leftValue": "",
+                  "caseSensitive": false,
+                  "typeValidation": "strict"
+                },
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "id": "b8501582-884a-5623-916a-cbf124e73dc5",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "leftValue": "={{ $json.action }}",
+                    "rightValue": "audit"
+                  }
+                ]
+              },
+              "renameOutput": true
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra",
+          "renameFallbackOutput": "Other"
+        }
+      },
+      "typeVersion": 3.2
+    },
+    {
+      "id": "60831737-76eb-5e4c-ac47-663d1f3e8e1d",
+      "name": "Post to OpenAI for Hook Variations",
+      "type": "n8n-nodes-base.httpRequest",
+      "onError": "continueRegularOutput",
+      "position": [
+        -390,
+        -280
+      ],
+      "parameters": {
+        "url": "https://api.openai.com/v1/chat/completions",
+        "method": "POST",
+        "options": {
+          "timeout": 30000
+        },
+        "jsonBody": "={{ JSON.stringify($json.requestBody) }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth"
+      },
+      "typeVersion": 4.2
+    },
+    {
+      "id": "14707475-c10a-5ac7-8d38-a2b5041f6ae6",
+      "name": "Build SEO Kit from Script",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        -120,
+        -280
+      ],
+      "parameters": {
+        "jsCode": "const v=$input.first().json;\nif(v.error||v.choices?.[0]?.finish_reason==='length')return [{json:{ok:false,errorCode:'upstream',error:'AI request failed or returned truncated content'}}];\ntry{\n const raw=v.choices?.[0]?.message?.content;const d=JSON.parse(raw);\n for(const k of ['title','hook_a','hook_b','supporting_text','cta','description','voiceover'])if(typeof d[k]!=='string'||!d[k].trim())throw Error('missing '+k);\n if(!Array.isArray(d.scenes)||d.scenes.length!==4)throw Error('expected four storyboard scenes');\n for(const s of d.scenes)for(const k of ['on_screen_text','visual_direction','voiceover_line'])if(typeof s[k]!=='string'||!s[k].trim())throw Error('scene missing '+k);\n const trim=(v,n)=>String(v).trim().slice(0,n);\n const hash=(Array.isArray(d.hashtags)?d.hashtags:[]).map(h=>('#'+String(h).replace(/^#+/,'').replace(/[^\\p{L}\\p{N}_]/gu,'')).slice(0,40)).filter(x=>x.length>1).slice(0,8);\n const kw=(Array.isArray(d.seo_keywords)?d.seo_keywords:[]).map(x=>trim(x,60)).filter(Boolean).slice(0,12);\n const words=d.voiceover.trim().split(/\\s+/).length;\n const title=trim(d.title,95), description=trim(d.description,1000);\n const kit={youtube:{title,description:description+'\\n'+hash.join(' ')},tiktok:{caption:trim(description,300)+' '+hash.join(' ')},instagram:{caption:trim(description,500)+'\\n'+hash.join(' ')},keywords:kw};\n return [{json:{ok:true,status:'draft_ready',requires_review:true,creator:'TYKAIRO-AI',draft:{title,hook_a:trim(d.hook_a,110),hook_b:trim(d.hook_b,110),supporting_text:trim(d.supporting_text,1200),cta:trim(d.cta,160),voiceover:trim(d.voiceover,1400),scenes:d.scenes.map((s,i)=>({shot:i+1,on_screen_text:trim(s.on_screen_text,150),visual_direction:trim(s.visual_direction,350),voiceover_line:trim(s.voiceover_line,260)})),hashtags:hash,seo_keywords:kw},publishing_kit:kit,copy_preflight:{words,approx_seconds:Math.round(words/2.5),voiceover_length_warning:words<65||words>105},next_action:'Review scripts and rights; optionally action=audit; then action=render with explicit approvals. Publishing is manual.'}}];\n}catch(e){return [{json:{ok:false,errorCode:'upstream',error:'Invalid AI script schema: '+String(e.message).slice(0,130)}}];}"
+      },
+      "typeVersion": 2
+    },
+    {
+      "id": "ea2229d4-37a7-5a94-989b-4eddbb613bac",
+      "name": "Respond with Storyboard and SEO Kit",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "position": [
+        140,
+        -280
+      ],
+      "parameters": {
+        "options": {
+          "responseCode": "={{ $json.ok ? 200 : ($json.errorCode === \"validation\" ? 400 : 502) }}"
+        },
+        "respondWith": "json",
+        "responseBody": "={{ $json }}"
+      },
+      "typeVersion": 1.1
+    },
+    {
+      "id": "7f63ceb7-8f6a-5fb3-8a0f-2ec9c82f54e1",
+      "name": "Post to Creatomate for Rendering",
+      "type": "n8n-nodes-base.httpRequest",
+      "onError": "continueRegularOutput",
+      "position": [
+        -384,
+        48
+      ],
+      "parameters": {
+        "url": "https://api.creatomate.com/v2/renders",
+        "method": "POST",
+        "options": {
+          "timeout": 30000
+        },
+        "jsonBody": "={{ JSON.stringify($json.requestBody) }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth"
+      },
+      "typeVersion": 4.2
+    },
+    {
+      "id": "d95b13e4-4f13-5153-97f6-a7a74b8b90e1",
+      "name": "Verify Render Job Submission",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        -112,
+        48
+      ],
+      "parameters": {
+        "jsCode": "const v=$input.first().json;\nif(v.error||!v.id)return [{json:{ok:false,errorCode:'upstream',error:'Creatomate did not accept the render job',details:String(v.hint||v.error||'').slice(0,120)}}];\nreturn [{json:{ok:true,status:'queued',renderId:v.id,renderStatus:v.status||'planned',renderUrl:v.url||null,warning:'Rendering is asynchronous. Use action=status with render_id to check readiness.'}}];"
+      },
+      "typeVersion": 2
+    },
+    {
+      "id": "d6d0d013-a440-5d8e-96cc-8a6018f6fcfc",
+      "name": "Respond with Render Job ID",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "position": [
+        144,
+        48
+      ],
+      "parameters": {
+        "options": {
+          "responseCode": "={{ $json.ok ? 200 : ($json.errorCode === \"validation\" ? 400 : 502) }}"
+        },
+        "respondWith": "json",
+        "responseBody": "={{ $json }}"
+      },
+      "typeVersion": 1.1
+    },
+    {
+      "id": "924d12ba-4fa7-51fc-9d91-6d477713d16f",
+      "name": "Fetch Creatomate Render Status",
+      "type": "n8n-nodes-base.httpRequest",
+      "onError": "continueRegularOutput",
+      "position": [
+        -384,
+        400
+      ],
+      "parameters": {
+        "url": "={{ 'https://api.creatomate.com/v2/renders/' + $json.renderId }}",
+        "method": "GET",
+        "options": {
+          "timeout": 30000
+        },
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth"
+      },
+      "typeVersion": 4.2
+    },
+    {
+      "id": "e3bfb9fd-aff0-5459-ad8e-843f9bb4f3d9",
+      "name": "Check Video Readiness",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        -112,
+        400
+      ],
+      "parameters": {
+        "jsCode": "const v=$input.first().json;\nif(v.error||!v.id)return [{json:{ok:false,errorCode:'upstream',error:'Could not retrieve render status; check credentials and job ID'}}];\nconst status=v.status||'unknown';return [{json:{ok:status!=='failed',status,renderId:v.id,videoUrl:status==='succeeded'?v.url:null,snapshotUrl:status==='succeeded'?(v.snapshot_url||null):null,errors:Array.isArray(v.errors)?v.errors:[],message:status==='succeeded'?'Video ready. Review visually before manual publishing.':status==='failed'?'Render failed: review Creatomate job errors.':'Video still processing; request status later.'}}];"
+      },
+      "typeVersion": 2
+    },
+    {
+      "id": "9156eb39-8b03-5657-851e-b4d79bbdcd99",
+      "name": "Respond with Final Video URL",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "position": [
+        144,
+        400
+      ],
+      "parameters": {
+        "options": {
+          "responseCode": "={{ $json.ok ? 200 : ($json.errorCode === \"validation\" ? 400 : 502) }}"
+        },
+        "respondWith": "json",
+        "responseBody": "={{ $json }}"
+      },
+      "typeVersion": 1.1
+    },
+    {
+      "id": "38987a14-1b47-5a4e-b4a8-f420f6d1ebea",
+      "name": "Handle and Normalize Input Errors",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        -384,
+        752
+      ],
+      "parameters": {
+        "jsCode": "return [{json:{ok:false,errorCode:'validation',error:$input.first().json.error||'Unknown action'}}];"
+      },
+      "typeVersion": 2
+    },
+    {
+      "id": "bc30cfc6-31ed-50d0-afff-cb4fd90b1649",
+      "name": "Respond with Validation Error",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "position": [
+        144,
+        752
+      ],
+      "parameters": {
+        "options": {
+          "responseCode": "={{ $json.ok ? 200 : ($json.errorCode === \"validation\" ? 400 : 502) }}"
+        },
+        "respondWith": "json",
+        "responseBody": "={{ $json }}"
+      },
+      "typeVersion": 1.1
+    },
+    {
+      "id": "81a9306e-858a-5093-874a-1749f261f2f0",
+      "name": "Execute Preflight Script Check",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        -256,
+        864
+      ],
+      "parameters": {
+        "jsCode": "const v=$input.first().json;\nreturn [{json:{ok:true,status:'audit_ready',audit:v.audit,note:v.note}}];"
+      },
+      "typeVersion": 2
+    },
+    {
+      "id": "1301841f-fb3f-57f6-82a2-36fdf9d76c65",
+      "name": "Respond with Preflight Checklist",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "position": [
+        64,
+        864
+      ],
+      "parameters": {
+        "options": {
+          "responseCode": 200
+        },
+        "respondWith": "json",
+        "responseBody": "={{ $json }}"
+      },
+      "typeVersion": 1.1
+    }
+  ],
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "connections": {
+    "Route by Video Task": {
+      "main": [
+        [
+          {
+            "node": "Post to OpenAI for Hook Variations",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Post to Creatomate for Rendering",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Fetch Creatomate Render Status",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Execute Preflight Script Check",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Handle and Normalize Input Errors",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Video Readiness": {
+      "main": [
+        [
+          {
+            "node": "Respond with Final Video URL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build SEO Kit from Script": {
+      "main": [
+        [
+          {
+            "node": "Respond with Storyboard and SEO Kit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Video Request Received": {
+      "main": [
+        [
+          {
+            "node": "Check Action and Budget Validity",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verify Render Job Submission": {
+      "main": [
+        [
+          {
+            "node": "Respond with Render Job ID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Preflight Script Check": {
+      "main": [
+        [
+          {
+            "node": "Respond with Preflight Checklist",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Creatomate Render Status": {
+      "main": [
+        [
+          {
+            "node": "Check Video Readiness",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Action and Budget Validity": {
+      "main": [
+        [
+          {
+            "node": "Route by Video Task",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Post to Creatomate for Rendering": {
+      "main": [
+        [
+          {
+            "node": "Verify Render Job Submission",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Handle and Normalize Input Errors": {
+      "main": [
+        [
+          {
+            "node": "Respond with Validation Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Post to OpenAI for Hook Variations": {
+      "main": [
+        [
+          {
+            "node": "Build SEO Kit from Script",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}
