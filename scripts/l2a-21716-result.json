@@ -1,0 +1,218 @@
+{
+  "verdict": "ALL_PASS",
+  "passed": 81,
+  "total": 81,
+  "failed": [],
+  "suites": [
+    {
+      "suite": "draft-ok",
+      "passed": 9,
+      "total": 9
+    },
+    {
+      "suite": "draft-defaults",
+      "passed": 4,
+      "total": 4
+    },
+    {
+      "suite": "draft-topic-short",
+      "passed": 2,
+      "total": 2
+    },
+    {
+      "suite": "draft-topic-long",
+      "passed": 1,
+      "total": 1
+    },
+    {
+      "suite": "draft-lang-blank",
+      "passed": 1,
+      "total": 1
+    },
+    {
+      "suite": "draft-platform-illegal",
+      "passed": 1,
+      "total": 1
+    },
+    {
+      "suite": "audit-ok",
+      "passed": 6,
+      "total": 6
+    },
+    {
+      "suite": "audit-title-long",
+      "passed": 1,
+      "total": 1
+    },
+    {
+      "suite": "audit-words-few",
+      "passed": 2,
+      "total": 2
+    },
+    {
+      "suite": "audit-words-many",
+      "passed": 1,
+      "total": 1
+    },
+    {
+      "suite": "audit-hook-eq-title",
+      "passed": 1,
+      "total": 1
+    },
+    {
+      "suite": "audit-guaranteed",
+      "passed": 1,
+      "total": 1
+    },
+    {
+      "suite": "audit-arabic",
+      "passed": 1,
+      "total": 1
+    },
+    {
+      "suite": "audit-missing-fields",
+      "passed": 1,
+      "total": 1
+    },
+    {
+      "suite": "render-ok",
+      "passed": 4,
+      "total": 4
+    },
+    {
+      "suite": "render-no-rights",
+      "passed": 1,
+      "total": 1
+    },
+    {
+      "suite": "render-approved-string",
+      "passed": 1,
+      "total": 1
+    },
+    {
+      "suite": "render-bad-template",
+      "passed": 1,
+      "total": 1
+    },
+    {
+      "suite": "render-hook-long",
+      "passed": 1,
+      "total": 1
+    },
+    {
+      "suite": "render-support-empty",
+      "passed": 1,
+      "total": 1
+    },
+    {
+      "suite": "status-ok",
+      "passed": 1,
+      "total": 1
+    },
+    {
+      "suite": "status-bad-uuid",
+      "passed": 1,
+      "total": 1
+    },
+    {
+      "suite": "status-missing",
+      "passed": 1,
+      "total": 1
+    },
+    {
+      "suite": "unknown-action",
+      "passed": 1,
+      "total": 1
+    },
+    {
+      "suite": "no-action",
+      "passed": 1,
+      "total": 1
+    },
+    {
+      "suite": "seokit-ok",
+      "passed": 14,
+      "total": 14
+    },
+    {
+      "suite": "seokit-err-v.error",
+      "passed": 1,
+      "total": 1
+    },
+    {
+      "suite": "seokit-err-truncated",
+      "passed": 1,
+      "total": 1
+    },
+    {
+      "suite": "seokit-err-badjson",
+      "passed": 1,
+      "total": 1
+    },
+    {
+      "suite": "seokit-err-scenes",
+      "passed": 1,
+      "total": 1
+    },
+    {
+      "suite": "seokit-err-emptykey",
+      "passed": 1,
+      "total": 1
+    },
+    {
+      "suite": "verify-ok",
+      "passed": 3,
+      "total": 3
+    },
+    {
+      "suite": "verify-ok2",
+      "passed": 2,
+      "total": 2
+    },
+    {
+      "suite": "verify-noid",
+      "passed": 1,
+      "total": 1
+    },
+    {
+      "suite": "verify-error",
+      "passed": 1,
+      "total": 1
+    },
+    {
+      "suite": "ready-succeeded",
+      "passed": 2,
+      "total": 2
+    },
+    {
+      "suite": "ready-failed",
+      "passed": 2,
+      "total": 2
+    },
+    {
+      "suite": "ready-processing",
+      "passed": 1,
+      "total": 1
+    },
+    {
+      "suite": "ready-error",
+      "passed": 1,
+      "total": 1
+    },
+    {
+      "suite": "norm-passthrough",
+      "passed": 1,
+      "total": 1
+    },
+    {
+      "suite": "norm-unknown",
+      "passed": 1,
+      "total": 1
+    },
+    {
+      "suite": "preflight-ok",
+      "passed": 1,
+      "total": 1
+    }
+  ]
+}
