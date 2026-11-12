@@ -46,3 +46,11 @@
 ## 验证结论
 
 L2 三关全绿：A 单元级 81/81（42 case）、B mock 全链 28/28（9 场景）、C 免费真跑 10/10（DeepSeek 真实产出蜜蜂主题脚本 + mock 渲染链）。详见 `docs/03-l2-verification.md`。
+
+---
+
+## 🛠️ 远程部署服务 ¥99
+
+不想自己折腾环境？工程师 ToDesk/向日葵 远程帮你把本课工作流装好调通（单课 × 1 次，≤60 分钟）。
+
+👉 [立即购买部署服务](https://n8nbox.cn/cashier?item=svc-remote-deploy-01)
